@@ -1,0 +1,17 @@
+d2ad35b3-a2a4-4398-a0b2-234881eb49e7:1751197974713:7:S:INSERT INTO Accounts VALUES (1001, 1, 'Savings', 5000);
+506ddd11-b901-4261-b5c6-5c6a67fad2d1:1751197975003:3:S:INSERT INTO Accounts VALUES (1002, 2, 'Savings', 10000);
+1cd51304-0bad-4577-a304-a3808efa8376:1751197975220:3:S:INSERT INTO Accounts VALUES (1003, 3, 'Current', 20000);
+130b0118-54f9-4dcb-a434-454233f0da4d:1751197975557:4:S:INSERT INTO Employees VALUES (201, 'Vishal', 50000, 10);
+77b10dc2-7ff2-4af1-baa7-a7502edf0a95:1751197975748:4:S:INSERT INTO Employees VALUES (202, 'Sanjana', 60000, 10);
+f98578e9-b316-4b83-a0bc-8775885e845a:1751197975886:4:S:INSERT INTO Employees VALUES (203, 'Keerthika', 45000, 20);
+756ef024-6245-4ebd-9542-55b051a20234:1751197976018:20:S:COMMIT;
+9c1f707a-d732-486a-8138-cbdf547f6d53:1751198009294:63:S:CREATE OR REPLACE PROCEDURE ProcessMonthlyInterest IS\nBEGIN\n  FOR acc IN (SELECT AccountID, Balance FROM Accounts WHERE AccountType = 'Savings') LOOP\n    UPDATE Accounts\n    SET Balance = Balance + (Balance * 0.01)\n    WHERE AccountID = acc.AccountID;\n\n    DBMS_OUTPUT.PUT_LINE('Interest applied to AccountID: ' || acc.AccountID);\n  END LOOP;\nEND;\n/
+414e8229-9d8e-4774-a275-93c152f39112:1751198021659:81:S:CREATE OR REPLACE PROCEDURE UpdateEmployeeBonus (\n  deptId IN NUMBER,\n  bonusPercent IN NUMBER\n) IS\nBEGIN\n  FOR emp IN (SELECT EmployeeID, Salary FROM Employees WHERE DepartmentID = deptId) LOOP\n    UPDATE Employees\n    SET Salary = Salary + (Salary * bonusPercent / 100)\n    WHERE EmployeeID = emp.EmployeeID;\n\n    DBMS_OUTPUT.PUT_LINE('Bonus applied to EmployeeID: ' || emp.EmployeeID);\n  END LOOP;\nEND;\n/
+f57df728-0be7-4894-bacd-66b3fb94a590:1751198044396:35:S:CREATE OR REPLACE PROCEDURE TransferFunds (\n  fromAccountId IN NUMBER,\n  toAccountId IN NUMBER,\n  amount IN NUMBER\n) IS\n  fromBalance NUMBER;\nBEGIN\n  SELECT Balance INTO fromBalance FROM Accounts WHERE AccountID = fromAccountId FOR UPDATE;\n\n  IF fromBalance < amount THEN\n    RAISE_APPLICATION_ERROR(-20001, 'Insufficient balance in source account.');\n  END IF;\n\n  -- Deduct from source\n  UPDATE Accounts\n  SET Balance = Balance - amount\n  WHERE AccountID = fromAccountId;\n\n  -- Add to destination\n  UPDATE Accounts\n  SET Balance = Balance + amount\n  WHERE AccountID = toAccountId;\n\n  DBMS_OUTPUT.PUT_LINE(amount || ' transferred from AccountID ' || fromAccountId || ' to AccountID ' || toAccountId);\nEND;\n/
+db40c6fd-5881-45eb-b4cb-1753f2ad0215:1751198052934:0:S:SET SERVEROUTPUT ON;
+d8261d74-0a1c-49f2-b131-a2aa432cc914:1751198053086:0:S:SET ECHO OFF;
+2ffdae5f-7716-4757-bf49-beeeee7b62ad:1751198053170:0:S:SET FEEDBACK OFF;
+ca9d2b45-ff40-4344-9e23-273b58799fae:1751198053320:19:S:EXEC ProcessMonthlyInterest;
+25ffa97f-1c11-4eb8-9444-46d35cdf45c8:1751198053768:18:S:EXEC UpdateEmployeeBonus(10, 10);
+136bf582-142d-4a6e-88bc-77e3bf4be226:1751198054137:13:S:EXEC TransferFunds(1002, 1003, 3000);
+5c87542a-0c62-483f-88b8-f9e708f729d9:1751198068257:0:S:@test_calls.sql

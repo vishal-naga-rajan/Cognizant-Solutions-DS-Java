@@ -1,0 +1,9 @@
+INSERT INTO Customers VALUES (1, 'Vishal', 65, 8000, 'N');
+INSERT INTO Customers VALUES (2, 'Sanjana', 45, 12000, 'N');
+INSERT INTO Customers VALUES (3, 'Keerthika', 70, 15000, 'N');
+
+INSERT INTO Loans VALUES (101, 1, 9.5, SYSDATE + 10);
+INSERT INTO Loans VALUES (102, 2, 10.0, SYSDATE + 45);
+INSERT INTO Loans VALUES (103, 3, 11.0, SYSDATE + 5);
+
+COMMIT;
